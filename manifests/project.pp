@@ -106,6 +106,11 @@ define shopware::project (
     php_version => $php_version
   }
 
+shopware::install::filesystem { "${name}-${version}":
+
+	src_path => $shopware_src
+}
+
   File {
     owner   => $site_user,
     group   => $site_group
