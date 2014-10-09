@@ -56,23 +56,4 @@ define shopware::install::source (
   	cwd         => "${src_path}/shopware_source",
   	require     => Exec["Checkout ${name}"]
   }
-#
-#  exec {"Copy in ${name} working directory":
-#  	command     => "sudo -u devshare cp ${src_pvi comath}/shopware_source/* ${src_path}/ -Rf",
-#  	creates     => "${src_path}/engine",
-#  	cwd         => "${src_path}",
-#  	onlyif  => "test ! -f ${src_path}/engine",
-#  }
-#
-#  exec {"Chown ${name}":
-#  	command     => "chown -R devshare:www-data ${src_path}/logs/ -Rf ${src_path}/cache/ -Rf",
-#  	cwd         => "${src_path}",
-#  	require     => Exec["Clone ${name}"]
-#  }
-#
-#  exec {"Chown filesystem":
-#	command     => "chmod 777 ${src_path}/logs/ -Rf ${src_path}/cache/ -Rf",
-#	cwd         => "${src_path}",
-#	require     => Exec["Checkout ${name}"]
-#  }
 }
