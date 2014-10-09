@@ -17,22 +17,29 @@ $src_path,
 
 ) {
 
-  exec {"Copy in ${name} working directory":
-  	command     => "sudo -u devshare cp ${src_path}/shopware_source/* ${src_path}/ -Rf",
-  	creates     => "${src_path}/engine",
-  	cwd         => "${src_path}",
-  	onlyif  => "test ! -f ${src_path}/engine",
-  }
+	exec {"Copy in ${name} working directory":
+		command     => "sudo -u devshare cp ${src_path}/shopware_source/* ${src_path}/ -Rf",
+		creates     => "${src_path}/engine",
+		cwd         => "${src_path}",
+		onlyif  => "test ! -f ${src_path}/engine",
+	}
 
-  exec {"Chown ${name}":
-  	command     => "chown -R devshare:www-data ${src_path}/logs/ -Rf ${src_path}/cache/ -Rf",
-  	cwd         => "${src_path}",
-  	require     => Exec["Clone ${name}"]
-  }
+	exec {"Copy .htaccess in ${name} working directory":
+		command     => "sudo -u devshare cp ${src_path}/shopware_source/.htaccess ${src_path}/.htaccess -Rf",
+		creates     => "${src_path}/.htaccess",
+		cwd         => "${src_path}",
+		onlyif  => "test ! -f ${src_path}/.htaccess",
+	}
 
-  exec {"Chown filesystem":
-	command     => "chmod 777 ${src_path}/logs/ -Rf ${src_path}/cache/ -Rf",
-	cwd         => "${src_path}",
-	require     => Exec["Checkout ${name}"]
-  }
+	exec {"Cleanup ${name} working directory":
+		command     => "rm ${src_path}/build -Rf ${src_path}/composer* -Rf ${src_path}/config.php.dist ${src_path}/eula* ${src_path}/license.txt -f ${src_path}/REAME* -f ${src_path}/_sql -Rf ${src_path}/UPGRADE* -f",
+		cwd         => "${src_path}",
+		onlyif  => "test -f ${src_path}/config.php.dist",
+	}
+
+	exec {"Chown filesystem":
+		command     => "chmod 777 ${src_path}/logs/ -Rf ${src_path}/cache/ -Rf",
+		cwd         => "${src_path}",
+		require     => Exec["Checkout ${name}"]
+	}
 }

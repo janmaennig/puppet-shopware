@@ -48,6 +48,7 @@ define shopware::install::source (
   	command     => "git checkout ${version} -f",
   	cwd         => "${src_path}/shopware_source",
   	require     => Exec["Clone ${name}"]
+	onlyif  => "test ! -f ${src_path}/shopware_source/engine",
   }
 
   exec {"Composer Update ${name}":
