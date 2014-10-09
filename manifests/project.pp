@@ -103,12 +103,14 @@ define shopware::project (
   shopware::install::source { "${name}-${version}":
     version  => $version,
     src_path => $shopware_src,
-    php_version => $php_version
+    php_version => $php_version,
+	site_user => $site_user
   }
 
 shopware::install::filesystem { "${name}-${version}":
 
-	src_path => $shopware_src
+	src_path => $shopware_src,
+	site_user => $site_user
 }
 
   File {

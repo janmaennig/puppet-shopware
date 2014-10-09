@@ -8,24 +8,29 @@
 #   Path to source directory.
 #   Example: '/var/www/shopware'
 #
+# [*site_user*]
+#   Project files owner
+#   Example: 'devshare'
+#
 # == Author
 # Jan Maennig
 #
 define shopware::install::filesystem (
 
 $src_path,
+$site_user
 
 ) {
 
 	exec {"Copy in ${name} working directory":
-		command     => "sudo -u devshare cp ${src_path}/shopware_source/* ${src_path}/ -Rf",
+		command     => "sudo -u ${site_user} cp ${src_path}/shopware_source/* ${src_path}/ -Rf",
 		creates     => "${src_path}/engine",
 		cwd         => "${src_path}",
 		onlyif  => "test ! -f ${src_path}/engine",
 	}
 
 	exec {"Copy .htaccess in ${name} working directory":
-		command     => "sudo -u devshare cp ${src_path}/shopware_source/.htaccess ${src_path}/.htaccess -Rf",
+		command     => "sudo -u ${site_user} cp ${src_path}/shopware_source/.htaccess ${src_path}/.htaccess -Rf",
 		creates     => "${src_path}/.htaccess",
 		cwd         => "${src_path}",
 		onlyif  => "test ! -f ${src_path}/.htaccess",

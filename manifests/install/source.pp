@@ -15,15 +15,19 @@
 # [*php_version*]
 #   PHP version for project.
 #   Example: '5.5.9'
+# [*site_user*]
+#   Project files owner
+#   Example: 'devshare'
 #
 # == Author
 # Jan Maennig
 #
 define shopware::install::source (
 
-  $version,
-  $src_path,
-  $php_version
+	$version,
+	$src_path,
+	$php_version,
+	$site_user
 
 ) {
 
@@ -31,7 +35,7 @@ define shopware::install::source (
 
   	file { "${src_path}/shopware_source":
 		ensure => "directory",
-		owner  => "devshare",
+		owner  => "${site_user}",
 		group  => "www-data",
 		mode   => 775,
 		require => File[$src_path]
@@ -47,8 +51,8 @@ define shopware::install::source (
   exec {"Checkout ${name}":
   	command     => "git checkout ${version} -f",
   	cwd         => "${src_path}/shopware_source",
-  	require     => Exec["Clone ${name}"]
-	onlyif  => "test ! -f ${src_path}/shopware_source/engine",
+  	require     => Exec["Clone ${name}"],
+	onlyif  => "test ! -f ${src_path}/shopware_source/engine"
   }
 
   exec {"Composer Update ${name}":
