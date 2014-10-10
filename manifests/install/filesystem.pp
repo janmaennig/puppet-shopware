@@ -37,7 +37,7 @@ $site_user
 	}
 
 	exec {"Cleanup ${name} working directory":
-		command     => "rm ${src_path}/build -Rf ${src_path}/composer* -Rf ${src_path}/config.php.dist ${src_path}/eula* ${src_path}/license.txt -f ${src_path}/REAME* -f ${src_path}/_sql -Rf ${src_path}/UPGRADE* -f",
+		command     => "rm ${src_path}/build -Rf ${src_path}/config.php.dist ${src_path}/eula* ${src_path}/license.txt -f ${src_path}/REAME* -f ${src_path}/_sql -Rf ${src_path}/UPGRADE* -f",
 		cwd         => "${src_path}",
 		onlyif  => "test -f ${src_path}/config.php.dist",
 	}
@@ -46,5 +46,19 @@ $site_user
 		command     => "chmod 777 ${src_path}/logs/ -Rf ${src_path}/cache/ -Rf",
 		cwd         => "${src_path}",
 		require     => Exec["Checkout ${name}"]
+	}
+
+	exec {"Composer self-update ${name}":
+		command     => "/usr/local/php/5.5.9/bin/php /usr/local/php/5.5.9/bin/composer.phar self-update",
+		environment => ["COMPOSER_HOME=${src_path}/shopware_source"],
+		cwd         => "${src_path}/",
+		#require     => File["/usr/local/php/5.5.9/bin/php"]
+	}
+
+	exec {"Composer install ${name}":
+		command     => "/usr/local/php/5.5.9/bin/php /usr/local/php/5.5.9/bin/composer.phar install",
+		environment => ["COMPOSER_HOME=${src_path}/shopware_source"],
+		cwd         => "${src_path}/",
+		#require     => File["/usr/local/php/5.5.9/bin/php"]
 	}
 }

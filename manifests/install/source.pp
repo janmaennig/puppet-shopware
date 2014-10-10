@@ -54,11 +54,4 @@ define shopware::install::source (
   	require     => Exec["Clone ${name}"],
 	onlyif  => "test ! -f ${src_path}/shopware_source/engine"
   }
-
-  exec {"Composer Update ${name}":
-  	command     => "/usr/local/php/${php_version}/bin/php /usr/local/php/${php_version}/bin/composer.phar update",
-  	environment => ["COMPOSER_HOME=${src_path}/shopware_source"],
-  	cwd         => "${src_path}/shopware_source",
-  	require     => Exec["Checkout ${name}"]
-  }
 }
