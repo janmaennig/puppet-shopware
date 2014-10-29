@@ -42,7 +42,7 @@ $site_user
 		onlyif  => "test -f ${src_path}/config.php.dist",
 	}
 
-	exec {"Chown filesystem":
+	exec {"Chown ${name} filesystem":
 		command     => "chmod 777 ${src_path}/logs/ -Rf ${src_path}/cache/ -Rf",
 		cwd         => "${src_path}",
 		require     => Exec["Checkout ${name}"]
