@@ -109,8 +109,9 @@ define shopware::project (
 		}
 
 		File {
-				owner   => $site_user,
-				group   => $site_group
+				owner       => $site_user,
+				group       => $site_group,
+				require     => [Exec["Copy in ${name} working directory"],Exec["Composer install ${name}"]]
 		}
 
 		File {
