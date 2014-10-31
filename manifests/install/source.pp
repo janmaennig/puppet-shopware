@@ -66,7 +66,7 @@ define shopware::install::source (
 						command     => "git checkout ${version} -f",
 						cwd         => "${src_path}/${version}",
 						onlyif      => "test ! -f ${src_path}/${version}/engine",
-						require => Exec["Clone ${name}"]
+						require     => Exec["Clone ${name}"]
 				}
 		}
 }
