@@ -10,7 +10,7 @@
 #
 # [*src_path*]
 #   Path to source directory.
-#   Example: '/var/www/shopware'
+#   Example: '/var/source_libs/shopware/'
 #
 # [*php_version*]
 #   PHP version for project.
@@ -24,34 +24,49 @@
 #
 define shopware::install::source (
 
-	$version,
-	$src_path,
-	$php_version,
-	$site_user
+		$version,
+		$src_path,
+		$php_version,
+		$site_user
 
 ) {
 
-  include shopware::params
+		include shopware::params
 
-  	file { "${src_path}/shopware_source":
-		ensure => "directory",
-		owner  => "${site_user}",
-		group  => "www-data",
-		mode   => 775,
-		require => File[$src_path]
-	}
+		if ! defined(File[$src_path]) {
+				file { "${src_path}":
+						ensure  => "directory",
+						owner   => "${site_user}",
+						group   => "www-data",
+						mode    => 775
+				}
+		}
 
-  exec {"Clone ${name}":
-  	command     => "git clone --no-hardlinks ${shopware::params::download_url} ${src_path}/shopware_source",
-  	creates     => "${src_path}/shopware_source/.git",
-  	cwd         => "${src_path}/shopware_source",
-  	onlyif  => "test ! -f ${src_path}/shopware_source/.git",
-  }
+		if ! defined(File["${src_path}/${version}"]) {
+				file { "${src_path}/${version}":
+						ensure  => "directory",
+						owner   => "${site_user}",
+						group   => "www-data",
+						mode    => 775,
+						require => File[$src_path]
+				}
+		}
 
-  exec {"Checkout ${name}":
-  	command     => "git checkout ${version} -f",
-  	cwd         => "${src_path}/shopware_source",
-  	require     => Exec["Clone ${name}"],
-	onlyif  => "test ! -f ${src_path}/shopware_source/engine"
-  }
+		if ! defined("Clone ${name}") {
+				exec { "Clone ${name}":
+						command     => "git clone --no-hardlinks ${shopware::params::download_url} ${src_path}/${version}",
+						creates     => "${src_path}/${version}/.git",
+						cwd         => "${src_path}/${version}",
+						onlyif      => "test ! -f ${src_path}/${version}/.git"
+				}
+		}
+
+		if ! defined("Checkout ${name}") {
+				exec { "Checkout ${name}":
+						command     => "git checkout ${version} -f",
+						cwd         => "${src_path}/${version}",
+						onlyif      => "test ! -f ${src_path}/${version}/engine",
+						require => Exec["Clone ${name}"]
+				}
+		}
 }

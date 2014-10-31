@@ -11,7 +11,7 @@
 #   TYPO3 version for project.
 #   Example: '4.3.0'
 #
-# [*shopware_src_path*]
+# [*shopware_src_path_path*]
 #   Path to TYPO3 sources.
 #   Example:  '/var/www/'
 #
@@ -64,67 +64,62 @@
 #
 define shopware::project (
 
-  $php_version,
-  $version,
-  $shopware_src_path = "",
-  $site_path,
-  $site_user,
-  $site_group,
+		$php_version,
+		$version,
+		$shopware_src_path,
+		$site_path,
+		$site_user,
+		$site_group,
 
-  $db_pass = "",
-  $db_user = "",
-  $db_host = "",
-  $db_name = "",
+		$db_pass = "",
+		$db_user = "",
+		$db_host = "",
+		$db_name = "",
 
-  $local_conf = {},
-  $extensions = [],
+		$local_conf = { },
+		$extensions = [],
 
-  $use_symlink = true,
-  $enable_install_tool = false
+		$use_symlink = true,
+		$enable_install_tool = false
 
 ) {
 
-  include shopware
+		include shopware
 
-  if ( $site_user != $site_group ) {
-    $dir_permission     = 2770
-    $file_permission    = 660
-  } else {
-    $dir_permission     = 2755
-    $file_permission    = 644
-  }
+		if ( $site_user != $site_group ) {
+				$dir_permission     = 2770
+				$file_permission    = 660
+		} else {
+				$dir_permission     = 2755
+				$file_permission    = 644
+		}
 
-  if ( $shopware_src_path == "" or $shopware_src_path == undef ) {
-    $shopware_src = $site_path
-  } else {
-    $shopware_src = $shopware_src_path
-  }
+		shopware::install::source { "${name}":
+				version     => $version,
+				src_path    => $shopware_src_path,
+				php_version => $php_version,
+				site_user   => $site_user
+		}
 
-  shopware::install::source { "${name}-${version}":
-    version  => $version,
-    src_path => $shopware_src,
-    php_version => $php_version,
-	site_user => $site_user
-  }
+		shopware::install::filesystem { "${name}":
+				version   => $version,
+				src_path  => $shopware_src_path,
+				site_user => $site_user,
+				site_path => $site_path
+		}
 
-shopware::install::filesystem { "${name}-${version}":
+		File {
+				owner   => $site_user,
+				group   => $site_group
+		}
 
-	src_path => $shopware_src,
-	site_user => $site_user
-}
+		File {
+				replace   => "no",
+				ensure    => "present",
+				mode      => $file_permission
+		}
 
-  File {
-    owner   => $site_user,
-    group   => $site_group
-  }
-
-  File {
-	replace   => "no",
-	ensure    => "present",
-	mode      => $file_permission
-  }
-
-  file { "${site_path}/config.php":
-	content   => template('shopware/config.php.erb'),
-  }
+		file { "${site_path}/config.php":
+				content   => template('shopware/config.php.erb'),
+		}
 }
