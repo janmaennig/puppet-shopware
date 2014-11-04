@@ -33,12 +33,12 @@ define shopware::install::source (
 
 		include shopware::params
 
-		if ! defined(File[$src_path]) {
-				file { "${src_path}":
-						ensure  => "directory",
-						owner   => "${site_user}",
-						group   => "www-data",
-						mode    => 775
+		if ! defined("Add source folders ${name}") {
+				exec { "Add source folders ${name}":
+						command     => "mkdir -p ${src_path}",
+						creates     => "${src_path}",
+						cwd         => "/",
+						onlyif      => "test ! -f ${site_user}"
 				}
 		}
 
@@ -48,7 +48,7 @@ define shopware::install::source (
 						owner   => "${site_user}",
 						group   => "www-data",
 						mode    => 775,
-						require => File[$src_path]
+						require     => Exec["Add source folders ${name}"]
 				}
 		}
 
